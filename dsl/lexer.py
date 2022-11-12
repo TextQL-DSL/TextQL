@@ -1,6 +1,7 @@
 from tokens import TextQL_Tokens
 import ply.lex as lex
 
+
 class Lexer:
 
     def __init__(self) -> None:
@@ -9,10 +10,9 @@ class Lexer:
         self.lastPosition = [-1]
         self.lexer = lex.lex(module=self)
 
-
     t_LPARENT = r'\('   # (
     t_RPARENT = r'\)'   # )
-    t_SEMICOLON = r'\;' # ;
+    t_SEMICOLON = r'\;'  # ;
     t_ADD = r'\+'       # +
     t_SUB = r'\-'       # -
     t_DIV = r'\/'       # /
@@ -37,7 +37,6 @@ class Lexer:
         t.type = "NUMBER"
         return t
 
-    
     def t_TYPE(self, t):
         r'[a-zA-Z][a-zA-Z_0-9]'
         t.type = self.keyword_tokens.get(t.value, "TYPE")
@@ -60,7 +59,6 @@ class Lexer:
         t.lexer.string_backslashed = False
         t.lexer.stringbuf = ""
 
-    
     def t_STRING_end(self, t):
         r'"'
         if not t.lexer.string_backslashed:
@@ -86,10 +84,6 @@ class Lexer:
                 t.lexer.string_backslashed = True
 
     t_STRING_ignore = ''
-    
-
-    
-
 
 
 if __name__ == "__main__":
