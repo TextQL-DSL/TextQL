@@ -94,7 +94,7 @@ class BinaryExpression(Expression):
 # Arithmetic Expressions.
 class Addition(BinaryExpression):
     def __init__(self):
-        super(Adition, self).__init__()
+        super(Addition, self).__init__()
 
 
 class Substraction(BinaryExpression):
