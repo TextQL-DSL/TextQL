@@ -78,7 +78,7 @@ class Variable(ASTNode):
         self.name = name
 
 
-# Expressionss.
+# Expressions.
 class Expression(ASTNode):
     def __init__(self):
         super().__init__()
@@ -92,7 +92,7 @@ class BinaryExpression(Expression):
 
 
 # Arithmetic Expressions.
-class Adition(BinaryExpression):
+class Addition(BinaryExpression):
     def __init__(self):
         super(Adition, self).__init__()
 
@@ -112,7 +112,7 @@ class Division(BinaryExpression):
         super(Division, self).__init__()
 
 
-# Boolean Expression.
+# Boolean Expressions.
 class Equal(BinaryExpression):
     def __init__(self):
         super(Equal, self).__init__()
