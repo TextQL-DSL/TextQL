@@ -1,4 +1,5 @@
-from lexer import lexer
+from distutils.spawn import spawn
+from dsl.lexer import lexer
 from ply import yacc
 
 tokens = lexer.tokens
@@ -11,6 +12,25 @@ precedence = (
 def handler():
     pass
 handler = handler()
+
+
+#--------------
+def p_script(p):
+    '''script : USE statement
+              | USE'''
+    pass
+
+# esto es ambiguo, el primer statement se cambia por lo que hereda de statement
+def p_statement(p):
+    '''statement : statement FUNC
+                 | statement DEF
+                 | statement'''
+    pass
+
+def p_use(p):
+    '''USE : extension path'''
+    p[0] = ('use', p[2], p[1])
+    pass
 
 #Binary Expressions
 def p_arithmetic_expression(p):
@@ -46,18 +66,25 @@ def p_variable(p):
     p[0] = ('variable', p[1])
 
 #--------------
-def p_script(p):
-    pass
-
 def p_function_modify(p):
     pass
 
 def p_function_filter(p):
     pass
 
-def p_use(p):
-    pass
-
 #If Then Else
 def p_ite(p):
     pass
+
+def p_empty(p):
+    '''empty : ''' 
+
+
+parser = yacc.yacc()
+
+def parse(data, debug=0):
+    parser.error = 0
+    p = parser.parse(data, debug=debug)
+    if parser.error:
+        return None
+    return p

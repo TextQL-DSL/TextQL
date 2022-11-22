@@ -1,5 +1,5 @@
-from tokens import TextQL_Tokens
-import ply.lex as lex
+from dsl.tokens import TextQL_Tokens
+from ply.lex import lex
 
 
 class Lexer:
@@ -85,7 +85,5 @@ class Lexer:
 
     t_STRING_ignore = ''
 
-
-if __name__ == "__main__":
-    lexer = Lexer()
-    print(lexer.tokens)
+# Build the lexer object
+lexer = lex()
