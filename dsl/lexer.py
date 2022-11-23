@@ -8,7 +8,7 @@ class Lexer:
         self.t = TextQL_Tokens()
         self.tokens = self.t.tokens
         self.lastPosition = [-1]
-        self.lexer = lex.lex(module=self)
+        # self.lexer = lex.lex(module=self)
 
     t_LPARENT = r'\('   # (
     t_RPARENT = r'\)'   # )
@@ -24,6 +24,10 @@ class Lexer:
     t_GREQ = r'\>\='    # >=
     t_ASSIGN = r'\='    # =
     t_COMPL = r'\!'     # !
+    t_JUSTWORD = r'(JUSTWORD)'
+    t_USE = r'(USE)'
+    t_PDF = r'(PDF)'
+
 
     def t_BOOLEAN(self, t):
         r'(true|false)'
@@ -37,10 +41,10 @@ class Lexer:
         t.type = "NUMBER"
         return t
 
-    def t_TYPE(self, t):
-        r'[a-zA-Z][a-zA-Z_0-9]'
-        t.type = self.keyword_tokens.get(t.value, "TYPE")
-        return t
+    # def t_TYPE(self, t):
+    #     r'[a-zA-Z][a-zA-Z_0-9]'
+    #     t.type = self.keyword_tokens.get(t.value, "TYPE")
+    #     return t
 
     def t_ID(self, t):
         r'\@[a-zA-Z][a-zA-Z_0-9]'
@@ -50,40 +54,55 @@ class Lexer:
     def t_newline(self, t):
         r'\n'
         t.lexer.lineno += 1
-        self.linelastpos.append(t.lexpos)
+        self.lastPosition.append(t.lexpos)
+
+
+     # Build the lexer
+    def build(self, **kwargs):
+        self.lexer = lex.lex(module=self, **kwargs)
+
+    def test(self, data):
+        self.lexer.input(data)
+        for token in self.lexer.token():
+            print(token)
+
+       # Build the lexer and try it out
 
     # STRING
-    def t_begin_STRING(self, t):
-        r'"'
-        t.lexer.begin("STRING")
-        t.lexer.string_backslashed = False
-        t.lexer.stringbuf = ""
+    # def t_begin_STRING(self, t):
+    #     r'"'
+    #     t.lexer.begin("STRING")
+    #     t.lexer.string_backslashed = False
+    #     t.lexer.stringbuf = ""
 
-    def t_STRING_end(self, t):
-        r'"'
-        if not t.lexer.string_backslashed:
-            t.lexer.begin("INITIAL")
-            t.value = t.lexer.stringbuf
-            t.type = "STRING"
-            return t
-        else:
-            t.lexer.stringbuf += '"'
-            t.lexer.string_backslashed = False
+    # def t_STRING_end(self, t):
+    #     r'"'
+    #     if not t.lexer.string_backslashed:
+    #         t.lexer.begin("INITIAL")
+    #         t.value = t.lexer.stringbuf
+    #         t.type = "STRING"
+    #         return t
+    #     else:
+    #         t.lexer.stringbuf += '"'
+    #         t.lexer.string_backslashed = False
 
-    def t_STRING_anything(self, t):
-        r'[^\n\x00]'
-        if t.lexer.string_backslashed:
-            if t.value in ['b', 't', 'n', 'f', '\\']:
-                t.lexer.stringbuf += '\\'
-            t.lexer.stringbuf += t.value
-            t.lexer.string_backslashed = False
-        else:
-            if t.value != '\\':
-                t.lexer.stringbuf += t.value
-            else:
-                t.lexer.string_backslashed = True
+    # def t_STRING_anything(self, t):
+    #     r'[^\n\x00]'
+    #     if t.lexer.string_backslashed:
+    #         if t.value in ['b', 't', 'n', 'f', '\\']:
+    #             t.lexer.stringbuf += '\\'
+    #         t.lexer.stringbuf += t.value
+    #         t.lexer.string_backslashed = False
+    #     else:
+    #         if t.value != '\\':
+    #             t.lexer.stringbuf += t.value
+    #         else:
+    #             t.lexer.string_backslashed = True
 
-    t_STRING_ignore = ''
+    # t_STRING_ignore = ''
 
-# Build the lexer object
-lexer = lex()
+
+if __name__ == "__main__":
+    lexer = Lexer()
+    lexer.build()
+    print(lexer.tokens)
