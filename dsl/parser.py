@@ -1,5 +1,5 @@
 from dsl.lexer import lexer
-from ply import yacc
+from ply.yacc import yacc
 
 tokens = lexer.tokens
 
@@ -7,11 +7,6 @@ precedence = (
     ('left', 'ADD', 'SUB'),
     ('left', 'MULT', 'DIV')
 )
-
-def handler():
-    pass
-handler = handler()
-
 
 #--------------
 def p_script(p):
@@ -27,9 +22,8 @@ def p_statement(p):
     pass
 
 def p_use(p):
-    '''USE : extension path'''
-    p[0] = ('use', p[2], p[1])
-    pass
+    '''command : USE STRING'''
+    p[0] = ('USE', p[2])
 
 #Binary Expressions
 def p_arithmetic_expression(p):
@@ -76,14 +70,10 @@ def p_ite(p):
     pass
 
 def p_empty(p):
-    '''empty : ''' 
+    '''empty : '''
 
+def p_error(p):
+    # print(f'Syntax error at {p.value!r}')
+    print("Syntax error in input!")
 
-parser = yacc.yacc()
-
-def parse(data, debug=0):
-    parser.error = 0
-    p = parser.parse(data, debug=debug)
-    if parser.error:
-        return None
-    return p
+parser = yacc()
