@@ -1,4 +1,3 @@
-from distutils.spawn import spawn
 from dsl.lexer import lexer
 from ply import yacc
 
