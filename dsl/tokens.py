@@ -17,7 +17,8 @@ class TextQL_Tokens:
             "THEN": "THEN",
             "ELSE": "ELSE",
             "define": "DEFINE",
-            "USE": "USE"
+            "USE": "USE",
+            "pdf": "PDF"
         }
 
     def __init__(self) -> None:
