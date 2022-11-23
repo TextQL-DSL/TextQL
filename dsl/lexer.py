@@ -1,5 +1,5 @@
-from tokens import TextQL_Tokens
-from lex import lex
+from dsl.tokens import TextQL_Tokens
+from ply.lex import lex
 
 
 class Lexer:

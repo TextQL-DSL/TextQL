@@ -1,4 +1,4 @@
-from ..Builtins.use import *
+from builtins.use import *
 
 globalList = []
 

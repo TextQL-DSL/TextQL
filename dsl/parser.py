@@ -1,5 +1,5 @@
-from lexer import lexer
-from ply import yacc
+from dsl.lexer import lexer
+from ply.yacc import yacc
 
 tokens = lexer.tokens
 
@@ -8,9 +8,22 @@ precedence = (
     ('left', 'MULT', 'DIV')
 )
 
-def handler():
+#--------------
+def p_script(p):
+    '''script : USE statement
+              | USE'''
     pass
-handler = handler()
+
+# esto es ambiguo, el primer statement se cambia por lo que hereda de statement
+def p_statement(p):
+    '''statement : statement FUNC
+                 | statement DEF
+                 | statement'''
+    pass
+
+def p_use(p):
+    '''command : USE STRING'''
+    p[0] = ('USE', p[2])
 
 #Binary Expressions
 def p_arithmetic_expression(p):
@@ -46,18 +59,21 @@ def p_variable(p):
     p[0] = ('variable', p[1])
 
 #--------------
-def p_script(p):
-    pass
-
 def p_function_modify(p):
     pass
 
 def p_function_filter(p):
     pass
 
-def p_use(p):
-    pass
-
 #If Then Else
 def p_ite(p):
     pass
+
+def p_empty(p):
+    '''empty : '''
+
+def p_error(p):
+    # print(f'Syntax error at {p.value!r}')
+    print("Syntax error in input!")
+
+parser = yacc()
