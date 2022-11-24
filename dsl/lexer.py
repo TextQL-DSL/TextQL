@@ -23,15 +23,17 @@ class Lexer:
             "define": "DEFINE",
             "USE": "USE",
             "pdf": "PDF",
+            "doc": "DOC",
             "string": "TYPE_STRING",
             "boolean": "TYPE_BOOLEAN",
             "number": "TYPE_NUMBER",
             "QUERY": "QUERY"
         }
 
-    def __init__(self) -> None:
+    def __init__(self,) -> None:
         self.tokens = self.basic_tokens + list(self.keyword_tokens.values())
         self.lastPosition = [-1]
+        self.lexer = lex.lex(module=self)
 
 
     t_LPARENT = r'\('   # (
