@@ -1,14 +1,38 @@
-from dsl.tokens import TextQL_Tokens
-from ply.lex import lex
+import ply.lex as lex
 
 
 class Lexer:
 
+    @property
+    def basic_tokens(self):
+        return ["ID", "TYPE", "LPARENT", "RPARENT", "SEMICOLON", "ADD", "SUB", "ASSIGN", "COMPL",
+            "DIV", "MULT", "EQ", "LE", "GR", "LEEQ", "GREQ", "NUMBER", "BOOLEAN","STRING", "ID_ACCESS",
+            "COMMENT"]
+
+
+    @property
+    def keyword_tokens(self) -> dict:
+        return {
+            "JUSTWORD": "JUSTWORD",
+            "LENGTH": "LENGTH",
+            "_touppercase": "TOUPPERCASE",
+            "_slice": "SLICE",
+            "IF": "IF",
+            "THEN": "THEN",
+            "ELSE": "ELSE",
+            "define": "DEFINE",
+            "USE": "USE",
+            "pdf": "PDF",
+            "string": "TYPE_STRING",
+            "boolean": "TYPE_BOOLEAN",
+            "number": "TYPE_NUMBER",
+            "QUERY": "QUERY"
+        }
+
     def __init__(self) -> None:
-        self.t = TextQL_Tokens()
-        self.tokens = self.t.tokens
+        self.tokens = self.basic_tokens + list(self.keyword_tokens.values())
         self.lastPosition = [-1]
-        # self.lexer = lex.lex(module=self)
+
 
     t_LPARENT = r'\('   # (
     t_RPARENT = r'\)'   # )
@@ -24,9 +48,10 @@ class Lexer:
     t_GREQ = r'\>\='    # >=
     t_ASSIGN = r'\='    # =
     t_COMPL = r'\!'     # !
-    t_JUSTWORD = r'(JUSTWORD)'
-    t_USE = r'(USE)'
-    t_PDF = r'(PDF)'
+
+    t_STRING = r'\".*?\"'
+    # Ignored characters
+    t_ignore = ' \t'
 
 
     def t_BOOLEAN(self, t):
@@ -41,21 +66,35 @@ class Lexer:
         t.type = "NUMBER"
         return t
 
-    # def t_TYPE(self, t):
-    #     r'[a-zA-Z][a-zA-Z_0-9]'
-    #     t.type = self.keyword_tokens.get(t.value, "TYPE")
-    #     return t
-
     def t_ID(self, t):
-        r'\@[a-zA-Z][a-zA-Z_0-9]'
-        t.type = "ID"
+        r'[a-zA-Z_][a-zA-Z_0-9]*'
+        if t.value in self.keyword_tokens.keys():
+            t.type = self.keyword_tokens[t.value]
+        else:
+            t.type = "ID"
+        
         return t
 
-    def t_newline(self, t):
-        r'\n'
-        t.lexer.lineno += 1
-        self.lastPosition.append(t.lexpos)
+    def t_ID_ACCESS(self, t):
+        r'@[a-zA-Z][a-zA-Z_0-9]*'
+        t.type = "ID_ACCESS"
+        
+        return t
 
+    def t_COMMENT(self, t):
+        r'//.*'
+        pass
+
+    # Ignored token with an action associated with it
+    def t_ignore_newline(self, t):
+        r'\n+'
+        t.lexer.lineno += t.value.count('\n')
+
+    # Error handler for illegal characters
+    def t_error(self, t):
+        # print(f'Illegal character {t.value[0]!r}')
+        print("Illegal character '%s'" % t.value[0])
+        t.lexer.skip(1)
 
      # Build the lexer
     def build(self, **kwargs):
@@ -63,46 +102,17 @@ class Lexer:
 
     def test(self, data):
         self.lexer.input(data)
-        for token in self.lexer.token():
-            print(token)
-
-       # Build the lexer and try it out
-
-    # STRING
-    # def t_begin_STRING(self, t):
-    #     r'"'
-    #     t.lexer.begin("STRING")
-    #     t.lexer.string_backslashed = False
-    #     t.lexer.stringbuf = ""
-
-    # def t_STRING_end(self, t):
-    #     r'"'
-    #     if not t.lexer.string_backslashed:
-    #         t.lexer.begin("INITIAL")
-    #         t.value = t.lexer.stringbuf
-    #         t.type = "STRING"
-    #         return t
-    #     else:
-    #         t.lexer.stringbuf += '"'
-    #         t.lexer.string_backslashed = False
-
-    # def t_STRING_anything(self, t):
-    #     r'[^\n\x00]'
-    #     if t.lexer.string_backslashed:
-    #         if t.value in ['b', 't', 'n', 'f', '\\']:
-    #             t.lexer.stringbuf += '\\'
-    #         t.lexer.stringbuf += t.value
-    #         t.lexer.string_backslashed = False
-    #     else:
-    #         if t.value != '\\':
-    #             t.lexer.stringbuf += t.value
-    #         else:
-    #             t.lexer.string_backslashed = True
-
-    # t_STRING_ignore = ''
+        while True:
+            tok = self.lexer.token()
+            if not tok: 
+                break      # No more input
+            print(tok)
 
 
 if __name__ == "__main__":
     lexer = Lexer()
     lexer.build()
-    print(lexer.tokens)
+    _input = ""
+    with open("test.txt") as file:
+        _input = file.read()
+    lexer.test(_input)
