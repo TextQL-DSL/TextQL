@@ -1,4 +1,4 @@
-from builtins.use import *
+from dsl_builtins.use import ReadPDF, ReadDocx
 
 globalList = []
 
@@ -61,7 +61,7 @@ class String(Const):
     '''
     def __init__(self, value):
         super(String, self).__init__()
-        self.value = value
+        self.value = value[1:-1] # remove quotes
 
 
 class Boolean(Const):
@@ -219,7 +219,7 @@ class NumericComplement(UnaryExpression):
 class BooleanComplement(UnaryExpression):
     def __init__(self, booleanExpression):
         super(BooleanComplement, self).__init__()
-        self.symbol = '-'
+        self.symbol = '!'
         self.booleanExpression = booleanExpression
 
 #endregion
@@ -257,10 +257,12 @@ class Use(ASTNode):
         self.docExtension = docExtension
 
     def eval(self):
-        if self.docExtension.doc_extension == 'docx':
-            globalList = ReadDocx(self.path)
+        if self.docExtension.doc_extension == 'doc':
+            globalList = ReadDocx(self.path.value)
+            print(globalList)
         elif self.docExtension.doc_extension == 'pdf':
-            globalList = ReadPDF(self.path)
+            globalList = ReadPDF(self.path.value)
+            print(globalList)
         else:
             assert f"Not supported extension {self.docExtension.doc_extension}."
 

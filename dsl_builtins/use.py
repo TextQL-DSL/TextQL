@@ -6,7 +6,7 @@ def ReadDocx(path: str) -> list[str]:
     '''
     Reads the docx file from the path and returns a list of the words in the document.
     '''
-    currDocument = docx.Document(path)
+    currDocument = docx.Document(Path(path))
     words = []
 
     for paragraph in currDocument.paragraphs:
@@ -21,7 +21,7 @@ def ReadPDF(path:str) -> list[str]:
     '''
     words = []
 
-    with open(path, 'rb') as file:
+    with open(Path(path), 'rb') as file:
         pdf = PyPDF2.PdfFileReader(file)
 
         for i in range(pdf.numPages):
