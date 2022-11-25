@@ -1,8 +1,10 @@
-# from lexer import lexer
-import lexer
 from ply.yacc import yacc
+from dsl.ast import *
+from dsl.lexer import Lexer
 
-tokens = lexer.Lexer().tokens
+lexer = Lexer()
+lexer.build()
+tokens = lexer.tokens
 
 precedence = (
     ('left', 'ADD', 'SUB'),
@@ -11,21 +13,25 @@ precedence = (
 
 #--------------
 def p_script(p):
-    '''script : use statement
-              | use'''
-    pass
+    '''script : USE PDF STRING SEMICOLON statement
+              | USE DOC STRING SEMICOLON statement
+              | USE PDF STRING SEMICOLON
+              | USE DOC STRING SEMICOLON'''
+    
+    doc_ext = DocExtension(p[2])
+    path = String(p[3])
+    use = Use(path, doc_ext)
+    use.eval()
 
-# esto es ambiguo, el primer statement se cambia por lo que hereda de statement
+    if(len(p) == 6):
+        p[0] = p[5]
+
+
 def p_statement(p):
     '''statement : query SEMICOLON statement 
                  | define SEMICOLON statement
                  | empty'''
     pass
-
-def p_use(p):
-    '''use : USE PDF STRING SEMICOLON
-               | USE DOC STRING SEMICOLON'''
-    p[0] = ('USE', p[2])
 
 
 def p_define(p):
@@ -122,14 +128,14 @@ def p_error(p):
     # print(f'Syntax error at {p.value!r}')
     print("Syntax error in input!")
 
-parser = yacc(method='SLR')
+parser = yacc()
 
 
 
 # myLex = lexer.Lexer()
 # lex = myLex.lexer
 
-file = open('test.txt')
-result = parser.parse('USE pdf "test";')
-file.close()
-print(result)
+#file = open('test.txt')
+#result = parser.parse('USE pdf "test";')
+#file.close()
+#print(result)

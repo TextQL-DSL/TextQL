@@ -51,7 +51,7 @@ class Lexer:
     t_ASSIGN = r'\='    # =
     t_COMPL = r'\!'     # !
 
-    t_STRING = r'\".*?\"'
+    t_STRING = r'\'.*?\''
     # Ignored characters
     t_ignore = ' \t'
 
