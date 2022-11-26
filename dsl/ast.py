@@ -64,9 +64,9 @@ class Query(Statement):
         super(Query, self).__init__()
         self.functions = functions
 
-    def eval(self, text):
+    def eval(self, text, globalDict):
         for function in self.functions:
-            text = function.eval(text)
+            text = function.eval(text, globalDict)
         
         return text
 
@@ -397,22 +397,15 @@ class Use(ASTNode):
         self.docExtension = docExtension
 
     def eval(self, globalDict):
+        globalText = ''
         if self.docExtension.doc_extension == 'doc':
-            globalList = ReadDocx(self.path.value)
-            print()
-            print()
-            print(globalList)
-            print()
-            print()
+            globalText = ReadDocx(self.path.value)
         elif self.docExtension.doc_extension == 'pdf':
-            globalList = ReadPDF(self.path.value)
-            print()
-            print()
-            print(globalList)
-            print()
-            print()
+            globalText = ReadPDF(self.path.value)
         else:
             assert f"Not supported extension {self.docExtension.doc_extension}."
+
+        return globalText
 
 
 
@@ -428,30 +421,29 @@ class Modify(Function):
     def __init__(self):
         super(Modify, self).__init__()
 
-    def eval(self, text):
+    def eval(self, text, globalDict):
         return text
 
 
 class ToUpperCase(Modify):
-    def __init__(self, input):
+    def __init__(self):
         super(ToUpperCase, self).__init__()
         self.name = '_touppercase'
-        self.input = input
 
-    def eval(self, text):
+    def eval(self, text, globalDict):
         text = [str.upper(word) for word in text]
         return text
 
 
 class Slice(Modify):
-    def __init__(self, input, length):
+    def __init__(self, lengthExpression):
         super(Slice, self).__init__()
         self.name = '_slice'
-        self.input = input
-        self.length = length
+        self.lengthExpression = lengthExpression
 
-    def eval(self, text):
-        text = [word[:self.length] for word in text]
+    def eval(self, text, globalDict):
+        exprResult = self.lengthExpression.eval(globalDict)
+        text = [word[:exprResult] for word in text]
         return text
 
 # Filter like functions.
@@ -459,26 +451,25 @@ class Filter(Function):
     def __init__(self):
         super(Filter, self).__init__()
 
-    def eval(self, text):
+    def eval(self, text, globalDict):
         return text
 
 class JustWord(Filter):
-    def __init__(self, input):
+    def __init__(self):
         super(JustWord, self).__init__()
         self.name = 'JUSTWORD'
-        self.input = input
 
-    def eval(self, text):
+    def eval(self, text, globalDict):
         text = [word for word in text if str.isalpha(word)]
         return text
 
 class Length(Filter):
-    def __init__(self, input, length):
+    def __init__(self, lengthExpression):
         super(Length, self).__init__()
-        self.input = input
-        self.length = length
+        self.lengthExpression = lengthExpression
 
-    def eval(self, text):
-        text = [word for word in text if len(word) <= self.length]
+    def eval(self, text, globalDict):
+        exprResult = self.lengthExpression.eval(globalDict)
+        text = [word for word in text if len(word) <= exprResult]
         return text
 

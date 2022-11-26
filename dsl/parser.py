@@ -102,7 +102,7 @@ def p_function_list(p):
         if not p[0]:
             p[0] = []
         if p[1]:
-            p[0] = [p[1]]+p[2]
+            p[0] = [p[1]] + p[2]
 
 def p_function(p):
     '''function : justword_func
@@ -222,43 +222,25 @@ def p_boolean_complement(p):
 
 # Functions
 def p_justword_func(p):
-    '''justword_func : JUSTWORD STRING
-                     | JUSTWORD'''
+    '''justword_func : JUSTWORD'''
 
-    if(len(p) == 2):
-        JustWord(input=None)
-    else:
-        JustWord(input=p[2])
+    p[0] = JustWord()
 
 
 def p_length_func(p):
-    '''length_func : LENGTH expression
-                   | LENGTH STRING expression'''
+    '''length_func : LENGTH expression'''
 
-    if(len(p) == 3):
-        Length(input=None, length=p[2])
-    else:
-        Length(input=p[2], length=p[3])
+    p[0] = Length(p[2])
 
 
 def p_touppercase_func(p):
-    '''touppercase_func : TOUPPERCASE
-                        | TOUPPERCASE STRING'''
-
-    if(len(p) == 2):
-        ToUpperCase(input=None)
-    else:
-        ToUpperCase(input=p[2])
+    '''touppercase_func : TOUPPERCASE'''
+    p[0] = ToUpperCase()
 
 
 def p_slice_func(p):
-    '''slice_func : SLICE expression
-                  | SLICE STRING expression'''
-    
-    if(len(p) == 3):
-        Slice(input=None, length=p[2])
-    else:
-        Slice(input=p[2], length=p[3])
+    '''slice_func : SLICE expression'''
+    p[0] = Slice(p[2])
 #--------------
 
 

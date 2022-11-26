@@ -17,11 +17,20 @@ class TextQLInterpreter:
         print(self.program.statementList)
         self.use = self.program.useStatement
         self.text = self.use.eval(self.globalDict)
+        print('text\n', self.text)
 
         for line in self.statements:
             print(line)
-            # line.eval(self.globalDict)
             print(line.cls())
+            cls = line.cls()
 
-        for value in self.globalDict.values():
-            print(value)
+            if cls == 'Define':
+                print('executing define')
+                line.eval(self.globalDict)
+            elif cls == 'Query':
+                print('executing query')
+                print(line.functions)
+                self.text = line.eval(self.text, self.globalDict)
+
+
+        print(self.text)
