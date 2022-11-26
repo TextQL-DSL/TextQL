@@ -1,0 +1,12 @@
+USE pdf "path";
+
+
+define number var = 3
+
+
+QUERY _touppercase;
+
+QUERY LENGTH @var;
+
+
+SAVE ;
