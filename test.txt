@@ -1,4 +1,4 @@
-USE doc '/home/rp/Documents/repos/TextQL/data.docx';
+USE pdf '/home/rp/Documents/repos/TextQL/data.pdf';
 define string rata = 'rata';
 define string gato = 'gato';
 define number max = 100;

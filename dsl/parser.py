@@ -20,12 +20,10 @@ def p_script(p):
     
     doc_ext = DocExtension(p[2])
     path = String(p[3])
-    use = Use(path, doc_ext)
-    use.eval()
+    Use(path, doc_ext)
 
     if(len(p) == 6):
         p[0] = p[5]
-
 
 def p_statement(p):
     '''statement : query SEMICOLON statement 
@@ -45,7 +43,6 @@ def p_define(p):
               | DEFINE TYPE_NUMBER ID ASSIGN arithmetic_expression'''
     
     Define(p[2], p[3], p[5])
-
 
 def p_query(p):
     '''query : QUERY function'''
@@ -134,18 +131,35 @@ def p_boolean_complement(p):
 def p_justword_func(p):
     '''justword_func : JUSTWORD'''
 
+    JustWord(input=None) #falta esta en ast
+
 
 def p_length_func(p):
     '''length_func : LENGTH arithmetic_expression'''
 
+    Length(input=None, length=p[2]) #falta esta en ast
+
 
 def p_touppercase_func(p):
-    '''touppercase_func : TOUPPERCASE'''
+    '''touppercase_func : TOUPPERCASE
+                        | TOUPPERCASE STRING'''
+
+    if(len[p] == 2):
+        ToUpperCase(input=None)
+    else:
+        ToUpperCase(input=p[1])
 
 
 def p_slice_func(p):
-    '''slice_func : SLICE arithmetic_expression'''
+    '''slice_func : SLICE arithmetic_expression
+                  | SLICE STRING arithmetic_expression'''
+    
+    if(len[p] == 3):
+        Slice(input=None, length=p[2])
+    else:
+        Slice(input=p[p[2]], length=p[3])
 #--------------
+
 
 def p_empty(p):
     '''empty : '''
