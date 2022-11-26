@@ -112,6 +112,21 @@ class Define(Expression):
         print('globalDict = ', len(globalDict))
 
 
+class IdAccess(Expression):
+
+    def __init__(self, id: str):
+        super(IdAccess, self).__init__()
+        self.value = None
+        self.setValue(id)
+
+    def setValue(self, id):
+        id = id[1:]
+        if id in globalDict.keys():
+            self.value = globalDict[id]
+        else:
+            assert f"ID {id} is not defined." 
+        
+
 # Binary Expression *********************
 class BinaryExpression(Expression):
     '''
