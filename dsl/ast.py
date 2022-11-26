@@ -29,6 +29,8 @@ class Statement(ASTNode):
     def __init__(self):
         super().__init__()
 
+    def eval(self, globalDict):
+        pass
 
 class StatementList(ASTNode):
     
@@ -51,6 +53,11 @@ class Define(Statement):
         globalDict[id] = self
         print(id, ' = ', globalDict[id].expression)
 
+    
+    def eval(self, globalDict):
+        globalDict[id] = self.expression.eval(globalDict)
+        print(id, globalDict[id])
+
 class Query(Statement):
 
     def __init__(self, functions):
@@ -72,6 +79,9 @@ class Const(ASTNode):
     def __init__(self):
         super(Const, self).__init__()
 
+    def eval(self, globalDict):
+        pass
+
 
 class Number(Const):
     '''
@@ -81,6 +91,11 @@ class Number(Const):
         super(Number, self).__init__()
         self.value = value
 
+    def eval(self, globalDict):
+        try:
+            return float(self.value)
+        except:
+            assert f"{self.value} is not of type number."
 
 class String(Const):
     '''
@@ -90,6 +105,11 @@ class String(Const):
         super(String, self).__init__()
         self.value = value[1:-1] # remove quotes
 
+    def eval(self, globalDict):
+        try:
+            return str(self.value)
+        except:
+            assert f"{self.value} is not of type string."
 
 class Boolean(Const):
     '''
@@ -99,6 +119,12 @@ class Boolean(Const):
     def __init__(self, value):
         super(Boolean, self).__init__()
         self.value = value
+
+    def eval(self, globalDict):
+        try:
+            return bool(self.value)
+        except:
+            assert f"{self.value} is not of type boolean."
 #endregion
 
 
@@ -115,7 +141,7 @@ class Expression(ASTNode):
     def __init__(self):
         super(Expression, self).__init__()
 
-    def eval(self):
+    def eval(self, globalDict):
         pass
 
 
@@ -135,6 +161,11 @@ class IdAccess(Expression):
         else:
             assert f"ID {id} is not defined." 
         
+    def eval(self, globalDict):
+        if id in globalDict.keys():
+            return globalDict[id]
+        else:
+            assert f"ID {id} is not defined."
 
 # Binary Expression *********************
 class BinaryExpression(Expression):
@@ -146,6 +177,9 @@ class BinaryExpression(Expression):
     def __init__(self):
         super(BinaryExpression, self).__init__()
 
+    def eval(self, globalDict):
+        pass
+
 #region Binary Boolean Operations
 class Equal(BinaryExpression):
     def __init__(self, left, right):
@@ -153,6 +187,12 @@ class Equal(BinaryExpression):
         self.symbol = '=='
         self.left = left
         self.right = right
+
+    def eval(self, globalDict):
+        try:
+            return self.left.eval() == self.right.eval()
+        except:
+            assert f"Invalid == operation exception."
 
 
 class Grater(BinaryExpression):
@@ -163,12 +203,26 @@ class Grater(BinaryExpression):
         self.right = right
 
 
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) > self.right.eval(globalDict)
+        except:
+            assert f"Invalid > operation exception."
+
+
 class Smaller(BinaryExpression):
     def __init__(self, left, right):
         super(Smaller, self).__init__()
         self.symbol = '<'
         self.left = left
         self.right = right
+
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) < self.right.eval(globalDict)
+        except:
+            assert f"Invalid < operation exception."
+
 
 
 class GraterEqual(BinaryExpression):
@@ -179,12 +233,26 @@ class GraterEqual(BinaryExpression):
         self.right = right
 
 
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) >= self.right.eval(globalDict)
+        except:
+            assert f"Invalid >= operation exception."
+
+
+
 class SmallerEqual(BinaryExpression):
     def __init__(self, left, right):
         super(SmallerEqual, self).__init__()
         self.symbol = '<='
         self.left = left
         self.right = right
+
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) <= self.right.eval(globalDict)
+        except:
+            assert f"Invalid <= operation exception."
 
 
 #endregion
@@ -200,6 +268,12 @@ class Addition(BinaryExpression):
         self.left = left
         self.right = right
 
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) + self.right.eval(globalDict)
+        except:
+            assert f"Invalid + operation exception."
+
 
 class Substraction(BinaryExpression):
     '''
@@ -210,6 +284,12 @@ class Substraction(BinaryExpression):
         self.symbol = '-'
         self.left = left
         self.right = right
+
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) - self.right.eval(globalDict)
+        except:
+            assert f"Invalid - operation exception."
 
 
 class Product(BinaryExpression):
@@ -223,6 +303,13 @@ class Product(BinaryExpression):
         self.right = right
 
 
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) * self.right.eval(globalDict)
+        except:
+            assert f"Invalid * operation exception."
+
+
 class Division(BinaryExpression):
     '''
     DIVISION -> EXPRESSION / EXPRESSION
@@ -232,6 +319,14 @@ class Division(BinaryExpression):
         self.symbol = '/'
         self.left = left
         self.right = right
+
+    
+    def eval(self, globalDict):
+        try:
+            return self.left.eval(globalDict) / self.right.eval(globalDict)
+        except:
+            assert f"Invalid / operation exception."
+
 
 #endregion
 
@@ -265,6 +360,13 @@ class IfThenElseExpression(Expression):
         self.elseExpression = elseExpression
 
 
+    def eval(self, globalDict):
+        try:
+            return self.thenExpression.eval(globalDict) if self.ifPredicate.eval(globalDict) else self.elseExpression.eval(globalDict)
+        except:
+            assert f"Invalid IF THEN ELSE operation exception."
+
+
 
 # Definition of a program.
 
@@ -288,7 +390,7 @@ class Use(ASTNode):
         self.path = path
         self.docExtension = docExtension
 
-    def eval(self):
+    def eval(self, globalDict):
         if self.docExtension.doc_extension == 'doc':
             globalList = ReadDocx(self.path.value)
             print()

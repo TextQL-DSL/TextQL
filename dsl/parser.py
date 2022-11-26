@@ -38,13 +38,13 @@ def p_use(p):
     path = String(p[3])
     use = Use(path, doc_ext)
     p[0] = use
-    use.eval()
+    # use.eval()
 
     if(len(p) == 6):
         p[0] = p[5]
 
 def p_statement_list(p):
-    '''statement_list : statement_list statement
+    '''statement_list : statement statement_list
                       | statement'''
     
     
@@ -52,11 +52,11 @@ def p_statement_list(p):
         p[0] = []
         p[0].append(p[1])
     elif len(p) == 3:
-        p[0] = p[1]
+        p[0] = p[2]
         if not p[0]:
             p[0] = []
         if p[2]:
-            p[0].append(p[2])
+            p[0].append(p[1])
     
     # if(len(p) == 2):
     #     p[0] = p[1]
@@ -83,7 +83,7 @@ def p_define(p):
               | DEFINE TYPE_BOOLEAN ID ASSIGN expression
               | DEFINE TYPE_NUMBER ID ASSIGN expression'''
     
-    Define(p[2], p[3], p[5])
+    p[0] = Define(p[2], p[3], p[5])
 
 
 def p_query(p):
