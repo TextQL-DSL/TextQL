@@ -1,4 +1,4 @@
-from ply.yacc import yacc
+from ply.yacc import yacc, yaccdebug
 from dsl.ast import *
 from dsl.lexer import Lexer
 
@@ -31,17 +31,26 @@ def p_statement(p):
     '''statement : query SEMICOLON statement 
                  | define SEMICOLON statement
                  | empty'''
-    pass
+    
+    if(len(p) == 2):
+        p[0] == p[1]
+    
+    else:
+        p[0] = (p[1], p[3])
 
 
 def p_define(p):
     '''define : DEFINE TYPE_STRING ID ASSIGN STRING
               | DEFINE TYPE_BOOLEAN ID ASSIGN boolean_expression
               | DEFINE TYPE_NUMBER ID ASSIGN arithmetic_expression'''
+    
+    Define(p[2], p[3], p[5])
 
 
 def p_query(p):
     '''query : QUERY function'''
+    
+    p[0] = p[2]
 
 
 def p_function(p):
@@ -50,22 +59,37 @@ def p_function(p):
                 | touppercase_func function
                 | slice_func function
                 | empty'''
+    
+    if(len(p) == 2):
+        p[0] = 1
+    
+    else:
+        p[0] = (p[1], p(2))
 
 
-# def p_expr(p):
-#     '''expr : arithmetic_expression
-#             | boolean_expression
-#             | ite'''
-
-#Binary Expressions
+# Binary Expressions
 def p_arithmetic_expression(p):
     '''arithmetic_expression : arithmetic_expression ADD arithmetic_expression
                              | arithmetic_expression SUB arithmetic_expression
                              | arithmetic_expression MULT arithmetic_expression
                              | arithmetic_expression DIV arithmetic_expression
                              | numeric_complement
-                             | NUMBER'''    
-    p[0] = ('arithmetic_expression', p[2], p[1], p[3])
+                             | NUMBER'''
+
+    if(len(p) == 2):
+        p[0] = p[1]
+    
+    elif(p[2] == 'ADD'):
+        p[0] = p[1] + p[3]
+
+    elif(p[2] == 'SUB'):
+        p[0] = p[1] - p[3]
+
+    elif(p[2] == 'MULT'):
+        p[0] = p[1] * p[3]
+    
+    elif(p[2] == 'DIV'):
+        p[0] = p[1] / p[3]
 
 def p_boolean_expression(p):
     '''boolean_expression : boolean_expression EQ boolean_expression
@@ -74,27 +98,39 @@ def p_boolean_expression(p):
                           | boolean_expression LEEQ boolean_expression
                           | boolean_expression GREQ boolean_expression
                           | boolean_complement
-                          | BOOLEAN'''
-    p[0] = ('boolean_expression', p[2], p[1], p[3])
+                          | BOOLEAN
+                          | arithmetic_expression'''
+    
+    if(len(p) == 2):
+        p[0] = p[1]
+    
+    elif(p[2] == 'EQ'):
+        p[0] = p[1] == p[3]
 
-#Unary Expressions
+    elif(p[2] == 'LE'):
+        p[0] = p[1] < p[3]
+
+    elif(p[2] == 'GR'):
+        p[0] = p[1] > p[3]
+    
+    elif(p[2] == 'LEEQ'):
+        p[0] = p[1] <= p[3]
+    
+    elif(p[2] == 'GREQ'):
+        p[0] = p[1] >= p[3]
+
+
+# Unary Expressions
 def p_numeric_complement(p):
     '''numeric_complement : SUB arithmetic_expression'''
-    p[0] = ('numeric_complement', '-', p[2])
+    p[0] = - p[2]
 
 def p_boolean_complement(p):
     '''boolean_complement : COMPL boolean_expression'''
-    p[0] = ('boolean_complement', '!', p[2])
+    p[0] = not (p[2])
 
-# def p_const(p):
-#     '''expr : const'''
-#     p[0] = ('const', p[1])
 
-# def p_variable(p):
-#     '''expr : variable'''
-#     p[0] = ('variable', p[1])
-
-#----------------functions
+# Functions
 def p_justword_func(p):
     '''justword_func : JUSTWORD'''
 
@@ -110,16 +146,6 @@ def p_touppercase_func(p):
 def p_slice_func(p):
     '''slice_func : SLICE arithmetic_expression'''
 #--------------
-# def p_function_modify(p):
-#     pass
-
-# def p_function_filter(p):
-#     pass
-
-#If Then Else
-# def p_ite(p):
-#     '''ite : IF boolean_expression THEN arithmetic_expression ELSE arithmetic_expression'''
-#     pass
 
 def p_empty(p):
     '''empty : '''
@@ -128,13 +154,10 @@ def p_error(p):
     # print(f'Syntax error at {p.value!r}')
     print("Syntax error in input!")
 
-parser = yacc()
+parser = yacc(debug=yaccdebug)
 
-
-
-# myLex = lexer.Lexer()
-# lex = myLex.lexer
-
+#myLex = lexer.Lexer()
+#lex = myLex.lexer
 #file = open('test.txt')
 #result = parser.parse('USE pdf "test";')
 #file.close()

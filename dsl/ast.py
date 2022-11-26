@@ -1,6 +1,7 @@
 from dsl_builtins.use import ReadPDF, ReadDocx
 
 globalList = []
+globalDict = {}
 
 class ASTNode:
     def __init__(self):
@@ -102,6 +103,9 @@ class Define(Expression):
         self.type = type
         self.id = id
         self.expression = expression
+
+        globalDict[id] = self
+        print(id, ' = ', globalDict[id].expression)
 
 
 # Binary Expression *********************
@@ -259,10 +263,18 @@ class Use(ASTNode):
     def eval(self):
         if self.docExtension.doc_extension == 'doc':
             globalList = ReadDocx(self.path.value)
+            print()
+            print()
             print(globalList)
+            print()
+            print()
         elif self.docExtension.doc_extension == 'pdf':
             globalList = ReadPDF(self.path.value)
+            print()
+            print()
             print(globalList)
+            print()
+            print()
         else:
             assert f"Not supported extension {self.docExtension.doc_extension}."
 

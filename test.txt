@@ -1,0 +1,7 @@
+USE doc '/home/rp/Documents/repos/TextQL/data.docx';
+define string rata = 'rata';
+define string gato = 'gato';
+define number max = 100;
+define number av_sum = 55 + 66;
+define boolean ready = false;
+define boolean small = 10 < 20;
