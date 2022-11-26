@@ -10,7 +10,6 @@ lexer = Lexer()
 lexer.build()
 tokens = lexer.tokens
 error_list = []
-errors = False
 
 
 precedence = (
@@ -200,7 +199,6 @@ def p_error(p):
     else:
         print(f'({p.lineno}, {p.lexpos}) - {PRSTX1} "{p.value}"')
         parser.errok()
-    errors = True
 
 
 parser = yacc(debug=yaccdebug)
