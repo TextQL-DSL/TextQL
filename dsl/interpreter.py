@@ -20,7 +20,8 @@ class TextQLInterpreter:
 
         for line in self.statements:
             print(line)
-            line.eval(self.globalDict)
+            # line.eval(self.globalDict)
+            print(line.cls())
 
         for value in self.globalDict.values():
             print(value)

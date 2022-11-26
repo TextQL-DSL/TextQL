@@ -6,3 +6,8 @@ define number av_sum = 55 + 66 * 2;
 define boolean ready = false;
 define boolean small = 10 < 20;
 define string ite = IF 10 < (@max * @av_sum) - 1 THEN 'small' ELSE 4;
+
+
+QUERY _touppercase;
+
+QUERY LENGTH @var;

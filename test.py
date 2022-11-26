@@ -25,12 +25,11 @@ file.close
 
 ast = parser.parse(data)
 
-# print()
-# print()
-# for statement in ast.statementList:
-#     print(statement)
+print()
+print()
+for statement in ast.statementList:
+    print(statement)
 
-#     print(statement.id)
 
 interpreter = TextQLInterpreter(ast)
 interpreter.run()
