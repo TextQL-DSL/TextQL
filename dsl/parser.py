@@ -37,6 +37,8 @@ def p_use(p):
     p[0] = use
     use.eval()
 
+    if(len(p) == 6):
+        p[0] = p[5]
 
 
 def p_statement(p):
@@ -56,7 +58,7 @@ def p_define(p):
               | DEFINE TYPE_BOOLEAN ID ASSIGN expression
               | DEFINE TYPE_NUMBER ID ASSIGN expression'''
     
-    p[0] = Define(p[2], p[3], p[5])
+    Define(p[2], p[3], p[5])
 
 
 def p_query(p):
@@ -189,20 +191,45 @@ def p_boolean_complement(p):
 
 # Functions
 def p_justword_func(p):
-    '''justword_func : JUSTWORD'''
+    '''justword_func : JUSTWORD
+                     : JUSTWORD STRING'''
+
+    if(len(p) == 2):
+        JustWord(input=None)
+    else:
+        JustWord(input=p[2])
 
 
 def p_length_func(p):
-    '''length_func : LENGTH expression'''
+    '''length_func : LENGTH arithmetic_expression
+                   : LENGTH STRING arithmetic_expression'''
+
+    if(len(p) == 3):
+        Length(input=None, length=p[2])
+    else:
+        Length(input=p[2], length=p[3])
 
 
 def p_touppercase_func(p):
-    '''touppercase_func : TOUPPERCASE'''
+    '''touppercase_func : TOUPPERCASE
+                        | TOUPPERCASE STRING'''
+
+    if(len(p) == 2):
+        ToUpperCase(input=None)
+    else:
+        ToUpperCase(input=p[2])
 
 
 def p_slice_func(p):
-    '''slice_func : SLICE expression'''
+    '''slice_func : SLICE arithmetic_expression
+                  | SLICE STRING arithmetic_expression'''
+    
+    if(len(p) == 3):
+        Slice(input=None, length=p[2])
+    else:
+        Slice(input=p[2], length=p[3])
 #--------------
+
 
 def p_empty(p):
     '''empty : '''

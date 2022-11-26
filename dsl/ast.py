@@ -1,4 +1,6 @@
 from dsl_builtins.use import ReadPDF, ReadDocx
+from dsl_builtins.modification_functions import ModdificationFunctions
+from dsl_builtins.filter_functions import filter_just_word, filter_length
 
 globalList = []
 globalDict = {}
@@ -106,6 +108,8 @@ class Define(Expression):
 
         globalDict[id] = self
         print(id, ' = ', globalDict[id].expression)
+        print('globalList = ', len(globalList))
+        print('globalDict = ', len(globalDict))
 
 
 class IdAccess(Expression):
@@ -274,22 +278,17 @@ class Use(ASTNode):
         super(Use, self).__init__()
         self.path = path
         self.docExtension = docExtension
+        self.eval()
 
     def eval(self):
         if self.docExtension.doc_extension == 'doc':
             globalList = ReadDocx(self.path.value)
             print()
-            print()
             print(globalList)
-            print()
-            print()
         elif self.docExtension.doc_extension == 'pdf':
             globalList = ReadPDF(self.path.value)
             print()
-            print()
             print(globalList)
-            print()
-            print()
         else:
             assert f"Not supported extension {self.docExtension.doc_extension}."
 
@@ -314,6 +313,11 @@ class ToUpperCase(Modify):
         self.name = '_touppercase'
         self.input = input
 
+        if(self.input == None):
+            self.input = globalList
+
+        globalList = ModdificationFunctions.toUpperCase(self.input)
+
 
 class Slice(Modify):
     def __init__(self, input, length):
@@ -321,6 +325,11 @@ class Slice(Modify):
         self.name = '_slice'
         self.input = input
         self.length = length
+
+        if(self.input == None):
+            self.input = globalList
+
+        globalList = ModdificationFunctions.wordSlice(self.input, self.length)
 
 
 # Filter like functions.
@@ -335,11 +344,21 @@ class JustWord(Filter):
         self.name = 'JUSTWORD'
         self.input = input
 
+        if(self.input == None):
+            self.input = globalList
+
+        globalList = filter_just_word(self.input)
+
 
 class Length(Filter):
     def __init__(self, input, length):
         super(Length, self).__init__()
         self.input = input
         self.length = length
+
+        if(self.input == None):
+            self.input = globalList
+
+        globalList = filter_length(self.input, self.length)
 
 
