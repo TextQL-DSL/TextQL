@@ -86,16 +86,18 @@ def p_arithmetic_expression_number(p):
     p[0] = Number(p[1])
 
 
-def p_arithmetic_expression(p):
+def p_binary_expression(p):
     '''expression : expression ADD expression
                   | expression SUB expression
                   | expression MULT expression
-                  | expression DIV expression'''
+                  | expression DIV expression
+                  | expression EQ expression
+                  | expression LE expression
+                  | expression GR expression
+                  | expression LEEQ expression
+                  | expression GREQ expression'''
 
-    if(len(p) == 2):
-        p[0] = Number(p[1])
-    
-    elif(p[2] == '+'):
+    if(p[2] == '+'):
         p[0] = Addition(p[1], p[3])
 
     elif(p[2] == '-'):
@@ -107,24 +109,6 @@ def p_arithmetic_expression(p):
     elif(p[2] == '/'):
         p[0] = Division(p[1],  p[3])
 
-
-
-def p_boolean_expression_boolean(p):
-    '''expression : BOOLEAN'''
-
-    p[0] = Boolean(True if p[1] == 'true' else False)
-
-
-def p_boolean_expression(p):
-    '''expression : expression EQ expression
-                  | expression LE expression
-                  | expression GR expression
-                  | expression LEEQ expression
-                  | expression GREQ expression'''
-    
-    if(len(p) == 2):
-        p[0] = p[1]
-    
     elif(p[2] == '=='):
         p[0] = Equal(p[1], p[3])
 
@@ -139,6 +123,44 @@ def p_boolean_expression(p):
     
     elif(p[2] == '>='):
         p[0] = GraterEqual(p[1], p[3])
+
+
+def p_parenthized_expression(p):
+    '''expression : 
+                  | LPARENT expression RPARENT'''
+    p[0] = p[2]
+
+
+def p_boolean_expression_boolean(p):
+    '''expression : BOOLEAN'''
+
+    p[0] = Boolean(True if p[1] == 'true' else False)
+
+
+# def p_boolean_expression(p):
+#     '''expression : expression EQ expression
+#                   | expression LE expression
+#                   | expression GR expression
+#                   | expression LEEQ expression
+#                   | expression GREQ expression'''
+    
+#     if(len(p) == 2):
+#         p[0] = p[1]
+    
+#     elif(p[2] == '=='):
+#         p[0] = Equal(p[1], p[3])
+
+#     elif(p[2] == '<'):
+#         p[0] = Smaller(p[1], p[3])
+
+#     elif(p[2] == '>'):
+#         p[0] = Grater(p[1], p[3])
+    
+#     elif(p[2] == '<='):
+#         p[0] = SmallerEqual(p[1], p[3])
+    
+#     elif(p[2] == '>='):
+#         p[0] = GraterEqual(p[1], p[3])
 
 
 def p_string(p):

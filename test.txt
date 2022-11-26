@@ -5,4 +5,4 @@ define number max = 100;
 define number av_sum = 55 + 66;
 define boolean ready = false;
 define boolean small = 10 < 20;
-define string ite = IF 10 < @max THEN 'small' ELSE 4;
+define string ite = IF 10 < (@max * @av_sum) - 1 THEN 'small' ELSE 4;
