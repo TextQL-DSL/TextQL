@@ -216,8 +216,8 @@ def p_boolean_complement(p):
 
 # Functions
 def p_justword_func(p):
-    '''justword_func : JUSTWORD
-                     : JUSTWORD STRING'''
+    '''justword_func : JUSTWORD STRING
+                     | JUSTWORD'''
 
     if(len(p) == 2):
         JustWord(input=None)
@@ -226,8 +226,8 @@ def p_justword_func(p):
 
 
 def p_length_func(p):
-    '''length_func : LENGTH arithmetic_expression
-                   : LENGTH STRING arithmetic_expression'''
+    '''length_func : LENGTH expression
+                   | LENGTH STRING expression'''
 
     if(len(p) == 3):
         Length(input=None, length=p[2])
@@ -246,8 +246,8 @@ def p_touppercase_func(p):
 
 
 def p_slice_func(p):
-    '''slice_func : SLICE arithmetic_expression
-                  | SLICE STRING arithmetic_expression'''
+    '''slice_func : SLICE expression
+                  | SLICE STRING expression'''
     
     if(len(p) == 3):
         Slice(input=None, length=p[2])
