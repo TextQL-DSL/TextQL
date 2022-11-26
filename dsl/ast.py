@@ -1,4 +1,6 @@
+from distutils.log import error
 from dsl_builtins.use import ReadPDF, ReadDocx
+from dsl_error import DSLError, NameError, TypeError
 
 globalList = []
 globalDict = {}
@@ -55,8 +57,13 @@ class Define(Statement):
 
     
     def eval(self, globalDict):
-        globalDict[id] = self.expression.eval(globalDict)
-        print(id, globalDict[id])
+        my_types = ['TYPE_STRING', 'TYPE_BOOLEAN', 'TYPE_NUMBER']
+
+        if(self.type in my_types):
+            globalDict[id] = self.expression.eval(globalDict)
+            print(id, globalDict[id])
+        else:
+            return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
 
 class Query(Statement):
 
