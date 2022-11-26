@@ -21,11 +21,14 @@ precedence = (
 
 #--------------
 def p_script(p):
-    '''script : use SEMICOLON statement
+    '''script : use SEMICOLON statement_list
               | use SEMICOLON'''
 
+    script = Script(p[1], None)
     if(len(p) == 4):
-        p[0] = p[3]
+        script.statementList = p[3]
+        
+    p[0] = script
 
 
 def p_use(p):
@@ -38,17 +41,39 @@ def p_use(p):
     use.eval()
 
 
+def p_statement_list(p):
+    '''statement_list : statement_list statement
+                      | statement'''
+    
+    
+    if len(p) == 2 and p[1]:
+        p[0] = []
+        p[0].append(p[1])
+    elif len(p) == 3:
+        p[0] = p[1]
+        if not p[0]:
+            p[0] = []
+        if p[2]:
+            p[0].append(p[2])
+    
+    # if(len(p) == 2):
+    #     p[0] = p[1]
+    
+    # else:
+    #     p[0] = (p[1], p[3])
+
+
 
 def p_statement(p):
-    '''statement : query SEMICOLON statement 
-                 | define SEMICOLON statement
-                 | empty'''
+    '''statement : query SEMICOLON 
+                 | define SEMICOLON'''
     
-    if(len(p) == 2):
-        p[0] = p[1]
+    p[0] = p[1]
+    # if(len(p) == 2):
+    #     p[0] = p[1]
     
-    else:
-        p[0] = (p[1], p[3])
+    # else:
+    #     p[0] = (p[1], p[3])
 
 
 def p_define(p):

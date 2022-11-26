@@ -19,13 +19,39 @@ class Script(ASTNode):
             | USE DEFINE
             | USE
     '''
-    def __init__(self, useStatement, queries, defines):
+    def __init__(self, useStatement, statementList = []):
         super(Script, self).__init__()
         self.useStatement = useStatement
-        self.queries = queries
-        self.defines = defines
+        self.statementList = statementList
 
-class Query(ASTNode):
+class Statement(ASTNode):
+
+    def __init__(self):
+        super().__init__()
+
+
+class StatementList(ASTNode):
+    
+    def __init__(self, statementlist):
+        super().__init__()
+        self.statementList = statementlist
+
+
+class Define(Statement):
+    '''
+    DEFINE ->   define type id = EXPRESSION;
+    '''
+
+    def __init__(self, type, id, expression):
+        super(Define, self).__init__()
+        self.type = type
+        self.id = id
+        self.expression = expression
+
+        globalDict[id] = self
+        print(id, ' = ', globalDict[id].expression)
+
+class Query(Statement):
 
     def __init__(self, functions):
         super(Query, self).__init__()
@@ -93,19 +119,6 @@ class Expression(ASTNode):
         pass
 
 
-class Define(Expression):
-    '''
-    DEFINE ->   define type id = EXPRESSION;
-    '''
-
-    def __init__(self, type, id, expression):
-        super(Define, self).__init__()
-        self.type = type
-        self.id = id
-        self.expression = expression
-
-        globalDict[id] = self
-        print(id, ' = ', globalDict[id].expression)
 
 
 class IdAccess(Expression):

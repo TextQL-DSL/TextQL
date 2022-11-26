@@ -1,5 +1,6 @@
 from dsl.parser import parser
 from dsl.lexer import Lexer
+from dsl.ast import *
 
 #data = "USE doc '/home/rp/Documents/repos/TextQL/data.docx';"
 #data = "USE pdf '/home/rp/Documents/repos/TextQL/data.pdf';"
@@ -20,4 +21,12 @@ print()
 lexer.test(data)
 print()
 print()
-parser.parse(data)
+
+ast = parser.parse(data)
+
+print()
+print()
+for statement in ast.statementList:
+    print(statement)
+
+    print(statement.id)
