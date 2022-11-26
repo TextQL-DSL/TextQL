@@ -71,6 +71,12 @@ class Query(Statement):
         super(Query, self).__init__()
         self.functions = functions
 
+    def eval(self, text):
+        for function in self.functions:
+            text = function.eval(text)
+        
+        return text
+
 
 
 #endregion
@@ -429,12 +435,19 @@ class Modify(Function):
     def __init__(self):
         super(Modify, self).__init__()
 
+    def eval(self, text):
+        return text
+
 
 class ToUpperCase(Modify):
     def __init__(self, input):
         super(ToUpperCase, self).__init__()
         self.name = '_touppercase'
         self.input = input
+
+    def eval(self, text):
+        text = [str.upper(word) for word in text]
+        return text
 
 
 class Slice(Modify):
@@ -444,12 +457,17 @@ class Slice(Modify):
         self.input = input
         self.length = length
 
+    def eval(self, text):
+        text = [word[:self.length] for word in text]
+        return text
 
 # Filter like functions.
 class Filter(Function):
     def __init__(self):
         super(Filter, self).__init__()
 
+    def eval(self, text):
+        return text
 
 class JustWord(Filter):
     def __init__(self, input):
@@ -457,6 +475,9 @@ class JustWord(Filter):
         self.name = 'JUSTWORD'
         self.input = input
 
+    def eval(self, text):
+        text = [word for word in text if str.isalpha(word)]
+        return text
 
 class Length(Filter):
     def __init__(self, input, length):
@@ -464,4 +485,7 @@ class Length(Filter):
         self.input = input
         self.length = length
 
+    def eval(self, text):
+        text = [word for word in text if len(word) <= self.length]
+        return text
 

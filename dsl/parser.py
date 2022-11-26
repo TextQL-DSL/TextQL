@@ -56,7 +56,7 @@ def p_statement_list(p):
         if not p[0]:
             p[0] = []
         if p[2]:
-            p[0].append(p[1])
+            p[0] = [p[1]] + p[2]
     
     # if(len(p) == 2):
     #     p[0] = p[1]
@@ -87,24 +87,30 @@ def p_define(p):
 
 
 def p_query(p):
-    '''query : QUERY function'''
-    
-    p[0] = p[2]
+    '''query : QUERY function_list'''
+    query = Query(p[2])
+    p[0] = query
 
+def p_function_list(p):
+    '''function_list : function function_list
+                     | function'''
+    if len(p) == 2 and p[1]:
+        p[0] = []
+        p[0].append(p[1])
+    elif len(p) == 3:
+        p[0] = p[2]
+        if not p[0]:
+            p[0] = []
+        if p[1]:
+            p[0] = [p[1]]+p[2]
 
 def p_function(p):
-    '''function : justword_func function
-                | length_func function
-                | touppercase_func function
-                | slice_func function
-                | empty'''
+    '''function : justword_func
+                | length_func
+                | touppercase_func
+                | slice_func'''
     
-    if(len(p) == 2):
-        p[0] = 1
-    
-    else:
-        p[0] = (p[1], p(2))
-
+    p[0] = p[1]
 
 # Binary Expressions
 
