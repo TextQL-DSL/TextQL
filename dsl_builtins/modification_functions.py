@@ -32,8 +32,4 @@ class ModdificationFunctions:
         slicedWords = [word[:length] for word in wordList]
 
         return slicedWords
-
-
-    
-    
-
+        
