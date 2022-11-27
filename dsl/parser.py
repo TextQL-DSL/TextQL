@@ -16,7 +16,8 @@ precedence = (
     ('right', 'ASSIGN'),
     ('nonassoc', 'EQ', 'LE', 'GR', 'LEEQ', 'GREQ'),
     ('left', 'ADD', 'SUB'),
-    ('left', 'MULT', 'DIV')
+    ('left', 'MULT', 'DIV'),
+    ('right', 'UMINUS'), 
 )
 
 #--------------
@@ -118,6 +119,11 @@ def p_function(p):
 def p_arithmetic_expression_number(p):
     '''expression : NUMBER'''
     p[0] = Number(p[1])
+
+
+def p_number_compl(p):
+    '''expression : SUB expression %prec UMINUS'''
+    p[0] = Number(-p[2])
 
 
 def p_binary_expression(p):

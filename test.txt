@@ -2,7 +2,7 @@ USE doc 'data.docx';
 define string rata = 'rata';
 define string gato = 'gato';
 define number max = 100;
-define number av_sum = 1;
+define number av_sum = -1;
 define boolean ready = false;
 define boolean small = 10 < 20;
 define string ite = IF 10 < (@max * @av_sum) - 1 THEN 'small' ELSE 4;
