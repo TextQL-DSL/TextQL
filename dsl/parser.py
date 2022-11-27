@@ -108,7 +108,8 @@ def p_function(p):
     '''function : justword_func
                 | length_func
                 | touppercase_func
-                | slice_func'''
+                | slice_func
+                | ite_function'''
     
     p[0] = p[1]
 
@@ -241,6 +242,11 @@ def p_touppercase_func(p):
 def p_slice_func(p):
     '''slice_func : SLICE expression'''
     p[0] = Slice(p[2])
+
+
+def p_ite_function(p):
+    '''ite_function : IF expression THEN function_list ELSE function_list'''
+    p[0] = IfThenElseFunction(p[2], p[4], p[6])
 #--------------
 
 

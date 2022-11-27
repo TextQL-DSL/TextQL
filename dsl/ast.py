@@ -1,6 +1,6 @@
 from distutils.log import error
 from dsl_builtins.use import ReadPDF, ReadDocx
-from dsl_error import DSLError, NameError, TypeError
+from dsl.dsl_error import DSLError, NameError, TypeError
 
 globalList = []
 globalDict = {}
@@ -57,11 +57,11 @@ class Define(Statement):
 
     
     def eval(self, globalDict):
-        my_types = ['TYPE_STRING', 'TYPE_BOOLEAN', 'TYPE_NUMBER']
-
+        my_types = ['string', 'boolean', 'number']
+        print("id", self.id)
         if(self.type in my_types):
-            globalDict[id] = self.expression.eval(globalDict)
-            print(id, globalDict[id])
+            globalDict[self.id] = self.expression.eval(globalDict)
+            print(self.id, globalDict[self.id])
         else:
             return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
 
@@ -164,21 +164,13 @@ class IdAccess(Expression):
 
     def __init__(self, id: str):
         super(IdAccess, self).__init__()
-        self.value = None
-        self.setValue(id)
+        self.id = id[1:]
 
-    def setValue(self, id):
-        id = id[1:]
-        if id in globalDict.keys():
-            self.value = globalDict[id]
-        else:
-            assert f"ID {id} is not defined." 
-        
     def eval(self, globalDict):
-        if id in globalDict.keys():
-            return globalDict[id]
+        if self.id in globalDict.keys():
+            return globalDict[self.id]
         else:
-            assert f"ID {id} is not defined."
+            assert f"ID {self.id} is not defined."
 
 # Binary Expression *********************
 class BinaryExpression(Expression):
@@ -449,8 +441,11 @@ class Slice(Modify):
         self.lengthExpression = lengthExpression
 
     def eval(self, text, globalDict):
-        exprResult = self.lengthExpression.eval(globalDict)
+        print(globalDict.keys())
+        exprResult = int(self.lengthExpression.eval(globalDict))
+        print(self.lengthExpression)
         text = [word[:exprResult] for word in text]
+        print(text)
         return text
 
 # Filter like functions.
@@ -476,7 +471,25 @@ class Length(Filter):
         self.lengthExpression = lengthExpression
 
     def eval(self, text, globalDict):
-        exprResult = self.lengthExpression.eval(globalDict)
+        exprResult = int(self.lengthExpression.eval(globalDict))
         text = [word for word in text if len(word) <= exprResult]
         return text
 
+
+class IfThenElseFunction(Function):
+    def __init__(self, predicate, ifFunctionList, elseFunctionList):
+        super(IfThenElseFunction, self).__init__()
+        self.predicate = predicate
+        self.ifFunctionList = ifFunctionList
+        self.elseFunctionList = elseFunctionList
+
+    def eval(self, text, globalDict):
+        predicateResult = self.predicate.eval(globalDict)
+        if predicateResult:
+            for function in self.ifFunctionList:
+                text = function.eval(text, globalDict)
+        else:
+            for function in self.elseFunctionList:
+                text = function.eval(text, globalDict)
+
+        return text
