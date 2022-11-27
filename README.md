@@ -52,6 +52,18 @@ define number sum = 4 + 5 + 6;
 define boolean small = 10 < 20;
 ```
 
+## Condicionales
+
+Uso de condicionales con ```IF```, ```THEN``` y ```ELSE```, por ejemplo:
+
+```
+define number max = 100;
+define number sum = 4 + 5 + 6;
+define boolean small = 10 < 20;
+
+define string ite = IF 10 < (@max * @sum) - 1 THEN 'small' ELSE 4;
+```
+
 ## Visión general
 Podemos encontrar tres directorios en la organización del proyecto:
 
