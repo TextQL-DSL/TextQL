@@ -1,4 +1,5 @@
 import string
+#from textblob import TextBlob, Word
 
 def list_to_str(s):
     empty_s = " "
@@ -26,5 +27,11 @@ def filter_stopwords(input):
                 'pero', 'sino', 'mas', 'porque', 'que']
     my_list = input
     my_list = [word for word in my_list if word not in stopwords]
+
+    return my_list
+
+def filter_lemmatize(input):
+    my_list = input
+    #my_list = [Word(word).lemmatize() for word in my_list]
 
     return my_list
