@@ -36,6 +36,10 @@ def test():
     interpreter.run()
 
 
+
+test()
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         sys.stderr.write('How to run a TextQL program: python TextQLCompiler.py <file_path>')
@@ -56,5 +60,3 @@ if __name__ == '__main__':
     ast = parser.parse(data)
     interpreter = TextQLInterpreter(ast)
     interpreter.run()
-
-test()

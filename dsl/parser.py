@@ -123,8 +123,10 @@ def p_arithmetic_expression_number(p):
 
 def p_number_compl(p):
     '''expression : SUB expression %prec UMINUS'''
-    p[0] = Number(-p[2])
+    p[0] = ArtithmeticComplement(p[2])
 
+
+# def p_boolean_complement
 
 def p_binary_expression(p):
     '''expression : expression ADD expression
@@ -217,11 +219,6 @@ def p_ite(p):
     '''expression : IF expression THEN expression ELSE expression'''
     p[0] = IfThenElseExpression(p[2], p[4], p[6])
 
-# Unary Expressions
-def p_numeric_complement(p):
-    '''numeric_complement : SUB expression'''
-    p[0] = - p[2]
-
 def p_boolean_complement(p):
     '''expression : COMPL expression'''
     p[0] = not (p[2])
@@ -255,14 +252,6 @@ def p_ite_function(p):
     p[0] = IfThenElseFunction(p[2], p[4], p[6])
 #--------------
 
-
-def p_empty(p):
-    '''empty : '''
-    p[0] = None
-
-# def p_error(p):
-#     # print(f'Syntax error at {p.value!r}')
-#     print("Syntax error in input!")
 
 def p_error(p):
     """

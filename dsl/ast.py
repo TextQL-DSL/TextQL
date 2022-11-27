@@ -59,21 +59,22 @@ class Define(Statement):
         my_types = ['string', 'boolean', 'number']
         print("id", self.id)
 
+        evalResult = self.expression.eval(globalDict)
         if(self.type == 'string'):
-            if(type(self.expression) == str):
-                globalDict[self.id] = self.expression.eval(globalDict)
+            if(type(evalResult) == str):
+                globalDict[self.id] = evalResult
             else:
                 return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
 
         elif(self.type == 'boolean'):
-            if(type(self.expression) == bool):
-                globalDict[self.id] = self.expression.eval(globalDict)
+            if(type(evalResult) == bool):
+                globalDict[self.id] = evalResult
             else:
                 return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
 
         elif(self.type == 'number'):
-            if(type(self.expression) == int or type(self.expression) == float):
-                globalDict[self.id] = self.expression.eval(globalDict)
+            if(type(evalResult) == int or type(self.expression) == float):
+                globalDict[self.id] = evalResult
             else:
                 return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
 
@@ -123,6 +124,23 @@ class Number(Const):
             return float(self.value)
         except:
             assert f"{self.value} is not of type number."
+
+
+class ArtithmeticComplement(Const):
+    '''
+    NUMBER -> number_value
+    '''
+    def __init__(self, expression):
+        super(ArtithmeticComplement, self).__init__()
+        self.expression = expression
+
+    def eval(self, globalDict):
+        try:
+            return -float(self.expression)
+        except:
+            assert f"{self.expression} is not of type number."
+
+
 
 class String(Const):
     '''
