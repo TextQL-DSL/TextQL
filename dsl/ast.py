@@ -1,5 +1,5 @@
 from dsl_builtins.use import ReadPDF, ReadDocx
-from dsl.dsl_error import DSLError, NameError, TypeError
+from dsl.dsl_error import *
 
 globalList = []
 globalDict = {}
@@ -411,15 +411,20 @@ class Use(ASTNode):
         # FileNotFoundError: [Errno 2] No such file or directory: '/fdata.docx'
 
     def eval(self, globalDict):
-        globalText = ''
-        if self.docExtension.doc_extension == 'doc':
-            globalText = ReadDocx(self.path.value)
-        elif self.docExtension.doc_extension == 'pdf':
-            globalText = ReadPDF(self.path.value)
-        else:
-            assert f"Not supported extension {self.docExtension.doc_extension}."
 
-        return globalText
+        try:
+            globalText = ''
+            if self.docExtension.doc_extension == 'doc':
+                globalText = ReadDocx(self.path.value)
+            elif self.docExtension.doc_extension == 'pdf':
+                globalText = ReadPDF(self.path.value)
+            else:
+                return DSLError(line=self.line, pos=self.pos, error_type=DocExtensionError())
+            return globalText
+
+        except FileNotFoundError:
+            return DSLError(line=self.line, pos=self.pos, error_type=PathError())
+        
 
 
 

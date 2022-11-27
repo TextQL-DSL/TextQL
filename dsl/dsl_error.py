@@ -28,3 +28,13 @@ class TypeError(ErrorType):
     """Error for type mismatch."""
     def __init__(self):
         self.message = 'Type mismatch'
+
+class PathError(ErrorType):
+    """Error for invalid path."""
+    def __init__(self):
+        self.message = 'Invalid path'
+
+class DocExtensionError(ErrorType):
+    """Error for invalid document extension."""
+    def __init__(self):
+        self.message = 'Invalid document extension'
