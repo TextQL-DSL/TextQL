@@ -38,3 +38,15 @@ class DocExtensionError(ErrorType):
     """Error for invalid document extension."""
     def __init__(self):
         self.message = 'Invalid document extension'
+
+
+class OperationError(ErrorType):
+    """Error for invalid operations."""
+    def __init__(self):
+        self.message = 'Invalid operation'
+
+
+class FunctionError(ErrorType):
+    """Error for function calls."""
+    def __init__(self):
+        self.message = 'Error in function'

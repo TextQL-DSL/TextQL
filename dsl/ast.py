@@ -30,7 +30,7 @@ class Statement(ASTNode):
     def __init__(self):
         super().__init__()
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         pass
 
 class StatementList(ASTNode):
@@ -55,28 +55,27 @@ class Define(Statement):
         #print(id, ' = ', globalDict[id].expression)
 
     
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         my_types = ['string', 'boolean', 'number']
-        print("id", self.id)
 
-        evalResult = self.expression.eval(globalDict)
+        evalResult = self.expression.eval(globalDict, errors)
         if(self.type == 'string'):
             if(type(evalResult) == str):
                 globalDict[self.id] = evalResult
             else:
-                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+                errors.append(DSLError(line=self.line, pos=self.pos, error_type=TypeError()))
 
         elif(self.type == 'boolean'):
             if(type(evalResult) == bool):
                 globalDict[self.id] = evalResult
             else:
-                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+                errors.append(DSLError(line=self.line, pos=self.pos, error_type=TypeError()))
 
         elif(self.type == 'number'):
-            if(type(evalResult) == int or type(self.expression) == float):
+            if(type(evalResult) == int or type(evalResult) == float):
                 globalDict[self.id] = evalResult
             else:
-                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+                errors.append(DSLError(line=self.line, pos=self.pos, error_type=TypeError()))
 
 
 
@@ -86,9 +85,9 @@ class Query(Statement):
         super(Query, self).__init__()
         self.functions = functions
 
-    def eval(self, text, globalDict):
+    def eval(self, text, globalDict, errors: list):
         for function in self.functions:
-            text = function.eval(text, globalDict)
+            text = function.eval(text, globalDict, errors)
         
         return text
 
@@ -107,7 +106,7 @@ class Const(ASTNode):
     def __init__(self):
         super(Const, self).__init__()
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         pass
 
 
@@ -119,11 +118,11 @@ class Number(Const):
         super(Number, self).__init__()
         self.value = value
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
             return float(self.value)
         except:
-            assert f"{self.value} is not of type number."
+            errors.append(DSLError(self.line, self.pos, error_type=TypeError()))
 
 
 class ArtithmeticComplement(Const):
@@ -134,11 +133,11 @@ class ArtithmeticComplement(Const):
         super(ArtithmeticComplement, self).__init__()
         self.expression = expression
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         try:
-            return -float(self.expression)
+            return -float(self.expression.eval(globalDict, errors))
         except:
-            assert f"{self.expression} is not of type number."
+            errors.append(DSLError(self.line, self.pos, error_type=TypeError()))
 
 
 
@@ -150,11 +149,11 @@ class String(Const):
         super(String, self).__init__()
         self.value = value[1:-1] # remove quotes
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
             return str(self.value)
         except:
-            assert f"{self.value} is not of type string."
+            errors.append(DSLError(self.line, self.pos, error_type=TypeError()))
 
 class Boolean(Const):
     '''
@@ -165,11 +164,11 @@ class Boolean(Const):
         super(Boolean, self).__init__()
         self.value = value
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
             return bool(self.value)
         except:
-            assert f"{self.value} is not of type boolean."
+            errors.append(DSLError(self.line, self.pos, error_type=TypeError()))
 #endregion
 
 
@@ -186,7 +185,7 @@ class Expression(ASTNode):
     def __init__(self):
         super(Expression, self).__init__()
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         pass
 
 
@@ -198,11 +197,11 @@ class IdAccess(Expression):
         super(IdAccess, self).__init__()
         self.id = id[1:]
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors:list):
         if self.id in globalDict.keys():
             return globalDict[self.id]
         else:
-            assert f"ID {self.id} is not defined."
+            errors.append(DSLError(self.line, self.pos, error_type=NameError()))
 
 # Binary Expression *********************
 class BinaryExpression(Expression):
@@ -214,7 +213,7 @@ class BinaryExpression(Expression):
     def __init__(self):
         super(BinaryExpression, self).__init__()
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         pass
 
 #region Binary Boolean Operations
@@ -225,11 +224,11 @@ class Equal(BinaryExpression):
         self.left = left
         self.right = right
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval() == self.right.eval()
+            return self.left.eval(globalDict, errors) == self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid == operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 class Grater(BinaryExpression):
@@ -240,11 +239,11 @@ class Grater(BinaryExpression):
         self.right = right
 
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) > self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) > self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid > operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 class Smaller(BinaryExpression):
@@ -254,11 +253,11 @@ class Smaller(BinaryExpression):
         self.left = left
         self.right = right
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) < self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) < self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid < operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 
@@ -270,11 +269,11 @@ class GraterEqual(BinaryExpression):
         self.right = right
 
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) >= self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) >= self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid >= operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 
@@ -285,11 +284,11 @@ class SmallerEqual(BinaryExpression):
         self.left = left
         self.right = right
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) <= self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) <= self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid <= operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 #endregion
@@ -305,11 +304,11 @@ class Addition(BinaryExpression):
         self.left = left
         self.right = right
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) + self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) + self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid + operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 class Substraction(BinaryExpression):
@@ -322,11 +321,11 @@ class Substraction(BinaryExpression):
         self.left = left
         self.right = right
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.left.eval(globalDict) - self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) - self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid - operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 class Product(BinaryExpression):
@@ -340,11 +339,11 @@ class Product(BinaryExpression):
         self.right = right
 
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         try:
-            return self.left.eval(globalDict) * self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) * self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid * operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 class Division(BinaryExpression):
@@ -358,11 +357,11 @@ class Division(BinaryExpression):
         self.right = right
 
     
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors):
         try:
-            return self.left.eval(globalDict) / self.right.eval(globalDict)
+            return self.left.eval(globalDict, errors) / self.right.eval(globalDict, errors)
         except:
-            assert f"Invalid / operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 #endregion
@@ -373,11 +372,11 @@ class UnaryExpression(Expression):
         super().__init__()
 
 
-class NumericComplement(UnaryExpression):
-    def __init__(self, numericExpression):
-        super(NumericComplement, self).__init__()
-        self.symbol = '-'
-        self.numericExpression = numericExpression
+# class NumericComplement(UnaryExpression):
+#     def __init__(self, numericExpression):
+#         super(NumericComplement, self).__init__()
+#         self.symbol = '-'
+#         self.numericExpression = numericExpression
 
 
 class BooleanComplement(UnaryExpression):
@@ -386,6 +385,11 @@ class BooleanComplement(UnaryExpression):
         self.symbol = '!'
         self.booleanExpression = booleanExpression
 
+    def eval(self, globalDict, errors):
+        try:
+            return not self.booleanExpression.eval(globalDict, errors)
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 #endregion
 
 class IfThenElseExpression(Expression):
@@ -397,11 +401,11 @@ class IfThenElseExpression(Expression):
         self.elseExpression = elseExpression
 
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
         try:
-            return self.thenExpression.eval(globalDict) if self.ifPredicate.eval(globalDict) else self.elseExpression.eval(globalDict)
+            return self.thenExpression.eval(globalDict, errors) if self.ifPredicate.eval(globalDict, errors) else self.elseExpression.eval(globalDict, errors)
         except:
-            assert f"Invalid IF THEN ELSE operation exception."
+            errors.append(DSLError(self.line, self.pos, error_type=OperationError()))
 
 
 
@@ -428,7 +432,7 @@ class Use(ASTNode):
         self.docExtension = docExtension
         # FileNotFoundError: [Errno 2] No such file or directory: '/fdata.docx'
 
-    def eval(self, globalDict):
+    def eval(self, globalDict, errors: list):
 
         try:
             globalText = ''
@@ -440,8 +444,8 @@ class Use(ASTNode):
                 return DSLError(line=self.line, pos=self.pos, error_type=DocExtensionError())
             return globalText
 
-        except FileNotFoundError:
-            return DSLError(line=self.line, pos=self.pos, error_type=PathError())
+        except:
+            errors.append(DSLError(line=self.line, pos=self.pos, error_type=PathError()))
         
 
 
@@ -458,7 +462,7 @@ class Modify(Function):
     def __init__(self):
         super(Modify, self).__init__()
 
-    def eval(self, text, globalDict):
+    def eval(self, text, globalDict, errors: list):
         return text
 
 
@@ -467,9 +471,12 @@ class ToUpperCase(Modify):
         super(ToUpperCase, self).__init__()
         self.name = '_touppercase'
 
-    def eval(self, text, globalDict):
-        text = [str.upper(word) for word in text]
-        return text
+    def eval(self, text, globalDict, errors: list):
+        try:
+            text = [str.upper(word) for word in text]
+            return text
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=FunctionError()))
 
 
 class Slice(Modify):
@@ -478,20 +485,24 @@ class Slice(Modify):
         self.name = '_slice'
         self.lengthExpression = lengthExpression
 
-    def eval(self, text, globalDict):
-        print(globalDict.keys())
-        exprResult = int(self.lengthExpression.eval(globalDict))
-        print(self.lengthExpression)
-        text = [word[:exprResult] for word in text]
-        print(text)
-        return text
+    def eval(self, text, globalDict, errors):
+        
+        try:
+            exprResult = int(self.lengthExpression.eval(globalDict, errors))
+            
+            text = [word[:exprResult] for word in text]
+            
+            return text
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=FunctionError()))
+
 
 # Filter like functions.
 class Filter(Function):
     def __init__(self):
         super(Filter, self).__init__()
 
-    def eval(self, text, globalDict):
+    def eval(self, text, globalDict, errors):
         return text
 
 class JustWord(Filter):
@@ -499,19 +510,25 @@ class JustWord(Filter):
         super(JustWord, self).__init__()
         self.name = 'JUSTWORD'
 
-    def eval(self, text, globalDict):
-        text = [word for word in text if str.isalpha(word)]
-        return text
+    def eval(self, text, globalDict, errors: list):
+        try:
+            text = [word for word in text if str.isalpha(word)]
+            return text
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=FunctionError()))
 
 class Length(Filter):
     def __init__(self, lengthExpression):
         super(Length, self).__init__()
         self.lengthExpression = lengthExpression
 
-    def eval(self, text, globalDict):
-        exprResult = int(self.lengthExpression.eval(globalDict))
-        text = [word for word in text if len(word) <= exprResult]
-        return text
+    def eval(self, text, globalDict, errors: list):
+        try:
+            exprResult = int(self.lengthExpression.eval(globalDict, errors))
+            text = [word for word in text if len(word) <= exprResult]
+            return text
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=FunctionError()))
 
 
 class IfThenElseFunction(Function):
@@ -521,13 +538,17 @@ class IfThenElseFunction(Function):
         self.ifFunctionList = ifFunctionList
         self.elseFunctionList = elseFunctionList
 
-    def eval(self, text, globalDict):
-        predicateResult = self.predicate.eval(globalDict)
-        if predicateResult:
-            for function in self.ifFunctionList:
-                text = function.eval(text, globalDict)
-        else:
-            for function in self.elseFunctionList:
-                text = function.eval(text, globalDict)
+    def eval(self, text, globalDict, errors: list):
 
-        return text
+        try:
+            predicateResult = self.predicate.eval(globalDict, errors)
+            if predicateResult:
+                for function in self.ifFunctionList:
+                    text = function.eval(text, globalDict, errors)
+            else:
+                for function in self.elseFunctionList:
+                    text = function.eval(text, globalDict, errors)
+
+            return text
+        except:
+            errors.append(DSLError(self.line, self.pos, error_type=FunctionError()))

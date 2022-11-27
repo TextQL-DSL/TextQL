@@ -28,6 +28,8 @@ def p_script(p):
     script = Script(p[1], None)
     if(len(p) == 4):
         script.statementList = p[3]
+    else:
+        script.statementList = []
         
     p[0] = script
 
@@ -38,6 +40,8 @@ def p_use(p):
     doc_ext = DocExtension(p[2])
     path = String(p[3])
     use = Use(path, doc_ext)
+    use.line = p.lineno(1)
+    use.pos = p.lexpos(1)
     p[0] = use
     # use.eval()
 
@@ -83,13 +87,17 @@ def p_define(p):
     '''define : DEFINE TYPE_STRING ID ASSIGN expression
               | DEFINE TYPE_BOOLEAN ID ASSIGN expression
               | DEFINE TYPE_NUMBER ID ASSIGN expression'''
-    
-    p[0] = Define(p[2], p[3], p[5])
+    define = Define(p[2], p[3], p[5])
+    define.line = p.lineno(1)
+    define.pos = p.lexpos(1)
+    p[0] = define
 
 
 def p_query(p):
     '''query : QUERY function_list'''
     query = Query(p[2])
+    query.line = p.lineno(1)
+    query.pos = p.lexpos(1)
     p[0] = query
 
 def p_function_list(p):
@@ -118,12 +126,18 @@ def p_function(p):
 
 def p_arithmetic_expression_number(p):
     '''expression : NUMBER'''
-    p[0] = Number(p[1])
+    number = Number(p[1])
+    number.line = p.lineno(1)
+    number.pos = p.lexpos(1)
+    p[0] = number
 
 
 def p_number_compl(p):
     '''expression : SUB expression %prec UMINUS'''
-    p[0] = ArtithmeticComplement(p[2])
+    compl = ArtithmeticComplement(p[2])
+    compl.line = p.lineno(1)
+    compl.pos = p.lexpos(1)
+    p[0] = compl
 
 
 # def p_boolean_complement
@@ -140,31 +154,58 @@ def p_binary_expression(p):
                   | expression GREQ expression'''
 
     if(p[2] == '+'):
-        p[0] = Addition(p[1], p[3])
+        add = Addition(p[1], p[3])
+        add.line = p.lineno(1)
+        add.pos = p.lexpos(1)
+        p[0] = add
 
     elif(p[2] == '-'):
-        p[0] = Substraction(p[1], p[3])
+        sub = Substraction(p[1], p[3])
+        sub.line = p.lineno(1)
+        sub.pos = p.lexpos(1)
+        p[0] = sub
 
     elif(p[2] == '*'):
-        p[0] = Product(p[1], p[3])
+        prod = Product(p[1], p[3])
+        prod.line = p.lineno(1)
+        prod.pos = p.lexpos(1)
+        p[0] = prod
     
     elif(p[2] == '/'):
-        p[0] = Division(p[1],  p[3])
+        div = Division(p[1],  p[3])
+        div.line = p.lineno(1)
+        div.pos = p.lexpos(1)
+        p[0] = div
 
     elif(p[2] == '=='):
-        p[0] = Equal(p[1], p[3])
+        eq = Equal(p[1], p[3])
+        eq.line = p.lineno(1)
+        eq.pos = p.lexpos(1)
+        p[0] = eq
 
     elif(p[2] == '<'):
-        p[0] = Smaller(p[1], p[3])
+        sm = Smaller(p[1], p[3])
+        sm.line = p.lineno(1)
+        sm.pos = p.lexpos(1)
+        p[0] = sm
 
     elif(p[2] == '>'):
-        p[0] = Grater(p[1], p[3])
+        gr = Grater(p[1], p[3])
+        gr.line = p.lineno(1)
+        gr.pos = p.lexpos(1)
+        p[0] = gr
     
     elif(p[2] == '<='):
-        p[0] = SmallerEqual(p[1], p[3])
+        smeq = SmallerEqual(p[1], p[3])
+        smeq.line = p.lineno(1)
+        smeq.pos = p.lexpos(1)
+        p[0] = smeq
     
     elif(p[2] == '>='):
-        p[0] = GraterEqual(p[1], p[3])
+        greq = GraterEqual(p[1], p[3])
+        greq.line = p.lineno(1)
+        greq.pos = p.lexpos(1)
+        p[0] = greq
 
 
 def p_parenthized_expression(p):
@@ -176,80 +217,81 @@ def p_parenthized_expression(p):
 def p_boolean_expression_boolean(p):
     '''expression : BOOLEAN'''
 
-    p[0] = Boolean(True if p[1] == 'true' else False)
-
-
-# def p_boolean_expression(p):
-#     '''expression : expression EQ expression
-#                   | expression LE expression
-#                   | expression GR expression
-#                   | expression LEEQ expression
-#                   | expression GREQ expression'''
-    
-#     if(len(p) == 2):
-#         p[0] = p[1]
-    
-#     elif(p[2] == '=='):
-#         p[0] = Equal(p[1], p[3])
-
-#     elif(p[2] == '<'):
-#         p[0] = Smaller(p[1], p[3])
-
-#     elif(p[2] == '>'):
-#         p[0] = Grater(p[1], p[3])
-    
-#     elif(p[2] == '<='):
-#         p[0] = SmallerEqual(p[1], p[3])
-    
-#     elif(p[2] == '>='):
-#         p[0] = GraterEqual(p[1], p[3])
-
+    boolean = Boolean(True if p[1] == 'true' else False)
+    boolean.line = p.lineno(1)
+    boolean.pos = p.lexpos(1)
+    p[0] = boolean
 
 def p_string(p):
     '''expression : STRING'''
-    p[0] = String(p[1])
+    string = String(p[1])
+    string.line = p.lineno(1)
+    string.pos = p.lexpos(1)
+    p[0] = string
 
 
 def p_id_access(p):
     '''expression : ID_ACCESS'''
-    p[0] = IdAccess(p[1])
+    id = IdAccess(p[1])
+    id.line = p.lineno(1)
+    id.pos = p.lexpos(1)
+    p[0] = id
 
 
 def p_ite(p):
     '''expression : IF expression THEN expression ELSE expression'''
-    p[0] = IfThenElseExpression(p[2], p[4], p[6])
+    ite = IfThenElseExpression(p[2], p[4], p[6])
+    ite.line = p.lineno(1)
+    ite.pos = p.lexpos(1)
+    p[0] = ite
 
 def p_boolean_complement(p):
     '''expression : COMPL expression'''
-    p[0] = not (p[2])
+    boolCompl = BooleanComplement(p[2])
+    boolCompl.line = p.lineno(1)
+    boolCompl.pos = p.lexpos(1)
+    p[0] = boolCompl
 
 
 # Functions
 def p_justword_func(p):
     '''justword_func : JUSTWORD'''
-
-    p[0] = JustWord()
+    justWord = JustWord()
+    justWord.line = p.lineno(1)
+    justWord.pos = p.lexpos(1)
+    p[0] = justWord
 
 
 def p_length_func(p):
     '''length_func : LENGTH expression'''
-
-    p[0] = Length(p[2])
+    length = Length(p[2])
+    length.line = p.lineno(1)
+    length.pos = p.lexpos(1)
+    p[0] = length 
 
 
 def p_touppercase_func(p):
     '''touppercase_func : TOUPPERCASE'''
-    p[0] = ToUpperCase()
+    toUpper = ToUpperCase()
+    toUpper.line = p.lineno(1)
+    toUpper.pos = p.lexpos(1)
+    p[0] = toUpper
 
 
 def p_slice_func(p):
     '''slice_func : SLICE expression'''
-    p[0] = Slice(p[2])
+    slice = Slice(p[2])
+    slice.line = p.lineno(1)
+    slice.pos = p.lexpos(1)
+    p[0] = slice
 
 
 def p_ite_function(p):
     '''ite_function : IF expression THEN function_list ELSE function_list'''
-    p[0] = IfThenElseFunction(p[2], p[4], p[6])
+    iteF = IfThenElseFunction(p[2], p[4], p[6])
+    iteF.line = p.lineno(1)
+    iteF.pos = p.lexpos(1)
+    p[0] = iteF
 #--------------
 
 

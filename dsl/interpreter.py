@@ -1,3 +1,4 @@
+import sys
 from dsl.ast import *
 
 class TextQLInterpreter:
@@ -5,33 +6,29 @@ class TextQLInterpreter:
     def __init__(self, program) -> None:
         self.program = program
 
-        print(program)
-
     
     def run(self):
-        print('**********RUN**********')
+        
         self.globalDict = {}            # All variables
-        self.errors = []              # Indicates program error
+        self.errors:list[DSLError] = []              # Indicates program error
         self.statements = self.program.statementList
-        print(self.program)
-        print(self.program.statementList)
         self.use = self.program.useStatement
-        self.text = self.use.eval(self.globalDict)
-        print('text\n', self.text)
+        self.text = self.use.eval(self.globalDict, self.errors)
 
-        for line in self.statements:
-            print(line)
-            print(line.cls())
+        for line in self.statements:            
             cls = line.cls()
 
             if cls == 'Define':
-                print('executing define')
-                line.eval(self.globalDict)
+                line.eval(self.globalDict, self.errors)
             elif cls == 'Query':
-                print('executing query')
-                print(line.functions)
-                print(self.globalDict.keys())
-                self.text = line.eval(self.text, self.globalDict)
+                self.text = line.eval(self.text, self.globalDict, self.errors)
 
-
-        print(self.text)
+        if len(self.errors) > 0:
+            errorSet = list(set([(err.line,str(err)) for err in self.errors]))
+            errorSet.sort(key=lambda x: x[0])
+            errorSet = [err[1] for err in errorSet]
+            for err in errorSet:
+                sys.stderr.write(f'{str(err)}\n')
+            exit(1)
+        else:
+            sys.stdout.write(f'{self.text}\n')

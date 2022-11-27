@@ -5,9 +5,8 @@ class Lexer:
 
     @property
     def basic_tokens(self):
-        return ["ID", "TYPE", "LPARENT", "RPARENT", "SEMICOLON", "ADD", "SUB", "ASSIGN", "COMPL",
-            "DIV", "MULT", "EQ", "LE", "GR", "LEEQ", "GREQ", "NUMBER", "BOOLEAN","STRING", "ID_ACCESS",
-            "COMMENT"]
+        return ["ID", "LPARENT", "RPARENT", "SEMICOLON", "ADD", "SUB", "ASSIGN", "COMPL",
+            "DIV", "MULT", "EQ", "LE", "GR", "LEEQ", "GREQ", "NUMBER", "BOOLEAN","STRING", "ID_ACCESS"]
 
 
     @property

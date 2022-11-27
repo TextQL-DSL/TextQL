@@ -20,16 +20,16 @@ def test():
     # print()
     # print()
 
-    lexer.test(data)
-    print()
-    print()
+    # lexer.test(data)
+    # print()
+    # print()
 
     ast = parser.parse(data)
 
-    print()
-    print()
-    for statement in ast.statementList:
-        print(statement)
+    # print()
+    # print()
+    # for statement in ast.statementList:
+    #     print(statement)
 
 
     interpreter = TextQLInterpreter(ast)
@@ -37,7 +37,7 @@ def test():
 
 
 
-test()
+# test()
 
 
 if __name__ == '__main__':
@@ -54,6 +54,7 @@ if __name__ == '__main__':
     except:
         sys.stdout.write(f'Error opening file {filePath}.')
         exit(1)
+            
             
     lexer = Lexer()
     lexer.build()
