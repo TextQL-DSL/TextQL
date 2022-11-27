@@ -19,3 +19,12 @@ def filter_just_word(input):
 
 def filter_length(input, length):
     return input[0:length]
+
+def filter_stopwords(input):
+    stopwords = ['a', 'ante', 'bajo', 'con', 'contra', 'de', 'desde', 'durante', 'en', 'entre', 'hacia', 'hasta', 
+                'mediante', 'para', 'por', 'según', 'sin', 'sobre', 'tras', 'aunque', 'y', 'e', 'ni', 'o', 'u', 
+                'pero', 'sino', 'mas', 'porque', 'que']
+    my_list = input
+    my_list = [word for word in my_list if word not in stopwords]
+
+    return my_list
