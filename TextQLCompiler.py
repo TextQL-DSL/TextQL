@@ -38,7 +38,7 @@ def test():
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        sys.stderr.write('How to run a TextQL program: python textQLcompiler.py <file_path>')
+        sys.stderr.write('How to run a TextQL program: python TextQLCompiler.py <file_path>')
         exit(1)
     filePath = sys.argv[2]
 
