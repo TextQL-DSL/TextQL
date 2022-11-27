@@ -30,6 +30,7 @@ class TextQLInterpreter:
             elif cls == 'Query':
                 print('executing query')
                 print(line.functions)
+                print(self.globalDict.keys())
                 self.text = line.eval(self.text, self.globalDict)
 
 

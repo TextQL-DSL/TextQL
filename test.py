@@ -19,9 +19,9 @@ file.close
 # print()
 # print()
 
-# lexer.test(data)
-# print()
-# print()
+lexer.test(data)
+print()
+print()
 
 ast = parser.parse(data)
 
