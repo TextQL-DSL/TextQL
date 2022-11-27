@@ -1,6 +1,6 @@
 from distutils.log import error
 from dsl_builtins.use import ReadPDF, ReadDocx
-from dsl_error import DSLError, NameError, TypeError
+from dsl.dsl_error import DSLError, NameError, TypeError
 
 globalList = []
 globalDict = {}
@@ -402,6 +402,7 @@ class Use(ASTNode):
         super(Use, self).__init__()
         self.path = path
         self.docExtension = docExtension
+        # FileNotFoundError: [Errno 2] No such file or directory: '/fdata.docx'
 
     def eval(self, globalDict):
         globalText = ''
