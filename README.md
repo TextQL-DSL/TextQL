@@ -63,6 +63,10 @@ define boolean small = 10 < 20;
 
 define string ite = IF 10 < (@max * @sum) - 1 THEN 'small' ELSE 4;
 ```
+```
+QUERY LENGTH 4 
+IF 20 > 10 THEN _slice 3 ELSE _slice 2;
+```
 
 ## Visión general
 Podemos encontrar tres directorios en la organización del proyecto:
