@@ -1,4 +1,3 @@
-from distutils.log import error
 from dsl_builtins.use import ReadPDF, ReadDocx
 from dsl.dsl_error import DSLError, NameError, TypeError
 
@@ -52,18 +51,33 @@ class Define(Statement):
         self.id = id
         self.expression = expression
 
-        globalDict[id] = self
-        print(id, ' = ', globalDict[id].expression)
+        #globalDict[id] = self
+        #print(id, ' = ', globalDict[id].expression)
 
     
     def eval(self, globalDict):
         my_types = ['string', 'boolean', 'number']
         print("id", self.id)
-        if(self.type in my_types):
-            globalDict[self.id] = self.expression.eval(globalDict)
-            print(self.id, globalDict[self.id])
-        else:
-            return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+
+        if(self.type == 'string'):
+            if(type(self.expression) == str):
+                globalDict[self.id] = self.expression.eval(globalDict)
+            else:
+                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+
+        elif(self.type == 'boolean'):
+            if(type(self.expression) == bool):
+                globalDict[self.id] = self.expression.eval(globalDict)
+            else:
+                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+
+        elif(self.type == 'number'):
+            if(type(self.expression) == int or type(self.expression) == float):
+                globalDict[self.id] = self.expression.eval(globalDict)
+            else:
+                return DSLError(line=self.line, pos=self.pos, error_type=TypeError())
+
+
 
 class Query(Statement):
 
